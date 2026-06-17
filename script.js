@@ -1,6 +1,4 @@
-// Aurora sign-up — replicates Amazon's 8-screen create-account flow with original UI.
-// Screens: 1 email -> 2 confirm-new -> 3 details -> 4 captcha-intro -> 5 captcha
-//          -> 6 email OTP -> 7 add mobile -> 8 sms OTP -> 9 success
+
 (function () {
   "use strict";
 
