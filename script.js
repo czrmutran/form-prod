@@ -1,4 +1,7 @@
-
+// Aurora sign-up — replicates Amazon's 8-screen create-account flow with original UI.
+// Element IDs mirror Amazon's real auth pages (ap_*, cvf-*, continue, auth-*-alert).
+// Screens: 1 email -> 2 confirm-new -> 3 details -> 4 captcha-intro -> 5 captcha
+//          -> 6 email OTP -> 7 add mobile -> 8 sms OTP -> 9 success
 (function () {
   "use strict";
 
@@ -39,47 +42,48 @@
     });
   });
 
-  // ---------- Screen 1: email/mobile ----------
-  $("clear-login").addEventListener("click", function () {
-    $("login").value = ""; $("login").focus(); setError("login", "err-login", "");
+  // ---------- Screen 1: email/mobile (ap_email_login) ----------
+  $("ap_email_login_clear").addEventListener("click", function () {
+    $("ap_email_login").value = ""; $("ap_email_login").focus();
+    setError("ap_email_login", "auth-email-missing-alert", "");
   });
-  $("form-1").addEventListener("submit", function (e) {
+  $("ap_signin_form").addEventListener("submit", function (e) {
     e.preventDefault();
-    var v = $("login").value.trim();
-    if (!v) return setError("login", "err-login", "Informe seu celular ou e-mail.");
-    if (!isEmail(v) && !isPhone(v)) return setError("login", "err-login", "Endereço de e-mail ou celular inválido.");
-    setError("login", "err-login", "");
+    var v = $("ap_email_login").value.trim();
+    if (!v) return setError("ap_email_login", "auth-email-missing-alert", "Informe seu celular ou e-mail.");
+    if (!isEmail(v) && !isPhone(v)) return setError("ap_email_login", "auth-email-missing-alert", "Endereço de e-mail ou celular inválido.");
+    setError("ap_email_login", "auth-email-missing-alert", "");
     state.login = v;
-    $("confirm-email").textContent = v;
-    $("login3").value = v;
+    $("ap_email_display").textContent = v;
+    $("ap_email").value = v;
     show(2);
   });
 
   // ---------- Screen 2: confirm new ----------
-  $("proceed-create").addEventListener("click", function () { show(3); });
+  $("ap_register_continue").addEventListener("click", function () { show(3); });
 
-  // ---------- Screen 3: account details ----------
-  $("form-3").addEventListener("submit", function (e) {
+  // ---------- Screen 3: account details (ap_register_form) ----------
+  $("ap_register_form").addEventListener("submit", function (e) {
     e.preventDefault();
-    var login = $("login3").value.trim();
-    var name = $("name").value.trim();
-    var pw = $("password").value;
-    var pw2 = $("password2").value;
+    var login = $("ap_email").value.trim();
+    var name = $("ap_customer_name").value.trim();
+    var pw = $("ap_password").value;
+    var pw2 = $("ap_password_check").value;
     var ok = true;
 
-    if (!login) ok = setError("login3", "err-login3", "Informe seu celular ou e-mail.") && ok;
-    else if (!isEmail(login) && !isPhone(login)) ok = setError("login3", "err-login3", "E-mail ou celular inválido.") && ok;
-    else setError("login3", "err-login3", "");
+    if (!login) ok = setError("ap_email", "auth-email-invalid-email-alert", "Informe seu celular ou e-mail.") && ok;
+    else if (!isEmail(login) && !isPhone(login)) ok = setError("ap_email", "auth-email-invalid-email-alert", "E-mail ou celular inválido.") && ok;
+    else setError("ap_email", "auth-email-invalid-email-alert", "");
 
-    ok = setError("name", "err-name", !name ? "Digite seu nome." : "") && ok;
+    ok = setError("ap_customer_name", "auth-customerName-missing-alert", !name ? "Digite seu nome." : "") && ok;
 
-    if (!pw) ok = setError("password", "err-password", "Crie uma senha.") && ok;
-    else if (pw.length < 6) ok = setError("password", "err-password", "A senha precisa de pelo menos 6 caracteres.") && ok;
-    else setError("password", "err-password", "");
+    if (!pw) ok = setError("ap_password", "auth-password-invalid-password-alert", "Crie uma senha.") && ok;
+    else if (pw.length < 6) ok = setError("ap_password", "auth-password-invalid-password-alert", "A senha precisa de pelo menos 6 caracteres.") && ok;
+    else setError("ap_password", "auth-password-invalid-password-alert", "");
 
-    if (!pw2) ok = setError("password2", "err-password2", "Digite a senha novamente.") && ok;
-    else if (pw !== pw2) ok = setError("password2", "err-password2", "As senhas não coincidem.") && ok;
-    else setError("password2", "err-password2", "");
+    if (!pw2) ok = setError("ap_password_check", "auth-password-mismatch-alert", "Digite a senha novamente.") && ok;
+    else if (pw !== pw2) ok = setError("ap_password_check", "auth-password-mismatch-alert", "As senhas não coincidem.") && ok;
+    else setError("ap_password_check", "auth-password-mismatch-alert", "");
 
     if (!ok) return;
     state.login = login; state.name = name;
@@ -87,7 +91,7 @@
   });
 
   // ---------- Screen 4: captcha intro ----------
-  $("start-puzzle").addEventListener("click", function () {
+  $("amzn-captcha-verify-button").addEventListener("click", function () {
     buildCaptcha();
     show(5);
   });
@@ -104,11 +108,10 @@
 
   function buildCaptcha() {
     var orbit = $("captcha-orbit");
-    // remove previously rendered slots
     orbit.querySelectorAll(".orbit-slot").forEach(function (n) { n.remove(); });
 
     captcha.target = Math.floor(Math.random() * SLOTS);
-    captcha.current = (captcha.target + 3 + Math.floor(Math.random() * 3)) % SLOTS; // start away from target
+    captcha.current = (captcha.target + 3 + Math.floor(Math.random() * 3)) % SLOTS;
     var icon = ICONS[Math.floor(Math.random() * ICONS.length)];
     var num = Math.floor(10 + Math.random() * 89);
 
@@ -142,70 +145,69 @@
   $("orbit-right").addEventListener("click", function () {
     captcha.current = (captcha.current + 1) % SLOTS; placeIcon();
   });
-  $("refresh-puzzle").addEventListener("click", buildCaptcha);
+  $("amzn-captcha-refresh-button").addEventListener("click", buildCaptcha);
 
-  $("submit-puzzle").addEventListener("click", function () {
+  $("amzn-btn-verify-internal").addEventListener("click", function () {
     if (captcha.current !== captcha.target) {
       setError(null, "err-captcha", "Posição incorreta. Mova o ícone até a órbita destacada.");
       return;
     }
     setError(null, "err-captcha", "");
-    // captcha solved -> send email OTP
     state.emailOtp = genOtp();
-    $("otp-email-target").textContent = state.login;
+    $("cvf-account-claim").textContent = state.login;
     $("otp-email-debug").textContent = "Demo: seu código é " + state.emailOtp;
     show(6);
-    $("email-otp").focus();
+    $("cvf-input-code").focus();
   });
 
-  // ---------- Screen 6: email OTP ----------
-  $("email-otp").addEventListener("input", function () { this.value = this.value.replace(/\D/g, "").slice(0, 6); });
-  $("form-6").addEventListener("submit", function (e) {
+  // ---------- Screen 6: email OTP (cvf-input-code) ----------
+  $("cvf-input-code").addEventListener("input", function () { this.value = this.value.replace(/\D/g, "").slice(0, 6); });
+  $("verification-code-form").addEventListener("submit", function (e) {
     e.preventDefault();
-    var v = $("email-otp").value.trim();
-    if (v.length < 6) return setError("email-otp", "err-email-otp", "Digite o código de 6 dígitos.");
-    if (v !== state.emailOtp) return setError("email-otp", "err-email-otp", "Código incorreto. Tente novamente.");
-    setError("email-otp", "err-email-otp", "");
+    var v = $("cvf-input-code").value.trim();
+    if (v.length < 6) return setError("cvf-input-code", "cvf-input-code-alert", "Digite o código de 6 dígitos.");
+    if (v !== state.emailOtp) return setError("cvf-input-code", "cvf-input-code-alert", "Código incorreto. Tente novamente.");
+    setError("cvf-input-code", "cvf-input-code-alert", "");
     show(7);
   });
-  $("resend-email").addEventListener("click", function (e) {
+  $("cvf-resend-link").addEventListener("click", function (e) {
     e.preventDefault();
     state.emailOtp = genOtp();
     $("otp-email-debug").textContent = "Demo: novo código é " + state.emailOtp;
-    $("email-otp").value = "";
+    $("cvf-input-code").value = "";
   });
 
-  // ---------- Screen 7: add mobile ----------
-  $("mobile").addEventListener("input", function () { this.value = this.value.replace(/[^\d\s().-]/g, ""); });
-  $("form-7").addEventListener("submit", function (e) {
+  // ---------- Screen 7: add mobile (ap_phone_number) ----------
+  $("ap_phone_number").addEventListener("input", function () { this.value = this.value.replace(/[^\d\s().-]/g, ""); });
+  $("cvf-add-phone-form").addEventListener("submit", function (e) {
     e.preventDefault();
-    var num = $("mobile").value.trim();
-    if (!num || num.replace(/\D/g, "").length < 8) return setError("mobile", "err-mobile", "Digite um número de celular válido.");
-    setError("mobile", "err-mobile", "");
-    state.phone = $("country").value + " " + num;
+    var num = $("ap_phone_number").value.trim();
+    if (!num || num.replace(/\D/g, "").length < 8) return setError("ap_phone_number", "auth-phone-missing-alert", "Digite um número de celular válido.");
+    setError("ap_phone_number", "auth-phone-missing-alert", "");
+    state.phone = $("cvf-phone-country-code").value + " " + num;
     state.smsOtp = genOtp();
-    $("phone-target").textContent = state.phone;
+    $("cvf-phone-display").textContent = state.phone;
     $("sms-otp-debug").textContent = "Demo: seu OTP é " + state.smsOtp;
     show(8);
-    $("sms-otp").focus();
+    $("cvf-input-code-phone").focus();
   });
 
-  // ---------- Screen 8: sms OTP ----------
-  $("sms-otp").addEventListener("input", function () { this.value = this.value.replace(/\D/g, "").slice(0, 6); });
-  $("form-8").addEventListener("submit", function (e) {
+  // ---------- Screen 8: sms OTP (cvf-input-code-phone) ----------
+  $("cvf-input-code-phone").addEventListener("input", function () { this.value = this.value.replace(/\D/g, "").slice(0, 6); });
+  $("cvf-verify-phone-form").addEventListener("submit", function (e) {
     e.preventDefault();
-    var v = $("sms-otp").value.trim();
-    if (v.length < 6) return setError("sms-otp", "err-sms-otp", "Digite o código de 6 dígitos.");
-    if (v !== state.smsOtp) return setError("sms-otp", "err-sms-otp", "Código incorreto. Tente novamente.");
-    setError("sms-otp", "err-sms-otp", "");
+    var v = $("cvf-input-code-phone").value.trim();
+    if (v.length < 6) return setError("cvf-input-code-phone", "cvf-input-code-phone-alert", "Digite o código de 6 dígitos.");
+    if (v !== state.smsOtp) return setError("cvf-input-code-phone", "cvf-input-code-phone-alert", "Código incorreto. Tente novamente.");
+    setError("cvf-input-code-phone", "cvf-input-code-phone-alert", "");
     $("welcome-name").textContent = state.name.split(" ")[0] || state.name;
     show(9);
   });
-  $("resend-sms").addEventListener("click", function (e) {
+  $("cvf-resend-link-phone").addEventListener("click", function (e) {
     e.preventDefault();
     state.smsOtp = genOtp();
     $("sms-otp-debug").textContent = "Demo: novo OTP é " + state.smsOtp;
-    $("sms-otp").value = "";
+    $("cvf-input-code-phone").value = "";
   });
 
   // ---------- restart ----------

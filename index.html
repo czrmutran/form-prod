@@ -23,19 +23,19 @@
     <div class="card-wrap">
       <div class="progress"><span id="progress-fill"></span></div>
 
-      <!-- ===== STEP 1: enter email/mobile ===== -->
+      <!-- ===== STEP 1: enter email/mobile (Amazon: /ap/signin email-first) ===== -->
       <section class="card" data-screen="1">
         <h1>Entrar ou criar conta</h1>
-        <form id="form-1" novalidate>
+        <form id="ap_signin_form" novalidate>
           <div class="field">
-            <label for="login">Número de celular ou e-mail</label>
+            <label for="ap_email_login">Número de celular ou e-mail</label>
             <div class="clear-wrap">
-              <input type="text" id="login" autocomplete="email" />
-              <button type="button" class="clear-btn" id="clear-login" aria-label="Limpar">✕</button>
+              <input type="text" id="ap_email_login" name="email" autocomplete="email" />
+              <button type="button" class="clear-btn" id="ap_email_login_clear" aria-label="Limpar">✕</button>
             </div>
-            <p class="error" id="err-login"></p>
+            <p class="error" id="auth-email-missing-alert"></p>
           </div>
-          <button type="submit" class="btn-primary">Continuar</button>
+          <button type="submit" class="btn-primary" id="continue">Continuar</button>
           <p class="legal">Ao continuar, você concorda com os <a href="#">Termos de Uso</a> e o <a href="#">Aviso de Privacidade</a> da Aurora.</p>
           <p class="alt-left"><a href="#">Precisa de ajuda?</a></p>
         </form>
@@ -47,40 +47,41 @@
       <!-- ===== STEP 2: new user confirm ===== -->
       <section class="card hidden" data-screen="2">
         <h1>Parece que você é novo por aqui</h1>
-        <p class="line-email"><span id="confirm-email">voce@exemplo.com</span> <a href="#" class="change-link" data-goto="1">Alterar</a></p>
+        <p class="line-email"><span id="ap_email_display">voce@exemplo.com</span> <a href="#" class="change-link" data-goto="1">Alterar</a></p>
         <p class="sub">Vamos criar uma conta usando seu e-mail.</p>
-        <button type="button" class="btn-primary" id="proceed-create">Prosseguir para criar conta</button>
+        <button type="button" class="btn-primary" id="ap_register_continue">Prosseguir para criar conta</button>
         <div class="divider"></div>
         <p class="strong-line">Já é cliente?</p>
         <p class="alt-left"><a href="#" data-goto="1">Entrar com outro e-mail ou celular</a></p>
       </section>
 
-      <!-- ===== STEP 3: create account ===== -->
+      <!-- ===== STEP 3: create account (Amazon: /ap/register) ===== -->
       <section class="card hidden" data-screen="3">
         <h1>Criar conta</h1>
-        <form id="form-3" novalidate>
+        <form id="ap_register_form" novalidate>
           <div class="field">
-            <label for="login3">Número de celular ou e-mail</label>
-            <input type="text" id="login3" autocomplete="email" />
-            <p class="error" id="err-login3"></p>
+            <label for="ap_email">Número de celular ou e-mail</label>
+            <input type="text" id="ap_email" name="email" autocomplete="email" />
+            <p class="error" id="auth-email-invalid-email-alert"></p>
           </div>
           <div class="field">
-            <label for="name">Seu nome</label>
-            <input type="text" id="name" autocomplete="name" placeholder="Nome e sobrenome" />
-            <p class="error" id="err-name"></p>
+            <label for="ap_customer_name">Seu nome</label>
+            <input type="text" id="ap_customer_name" name="customerName" autocomplete="name" placeholder="Nome e sobrenome" />
+            <p class="error" id="auth-customerName-missing-alert"></p>
           </div>
           <div class="field">
-            <label for="password">Senha <span class="label-soft">(mínimo de 6 caracteres)</span></label>
-            <input type="password" id="password" autocomplete="new-password" />
+            <label for="ap_password">Senha <span class="label-soft">(mínimo de 6 caracteres)</span></label>
+            <input type="password" id="ap_password" name="password" autocomplete="new-password" />
             <p class="hint"><span class="i-info">i</span> As senhas devem ter pelo menos 6 caracteres.</p>
-            <p class="error" id="err-password"></p>
+            <p class="error" id="auth-password-invalid-password-alert"></p>
           </div>
           <div class="field">
-            <label for="password2">Digite a senha novamente</label>
-            <input type="password" id="password2" autocomplete="new-password" />
-            <p class="error" id="err-password2"></p>
+            <label for="ap_password_check">Digite a senha novamente</label>
+            <input type="password" id="ap_password_check" name="passwordCheck" autocomplete="new-password" />
+            <p class="error" id="auth-password-mismatch-alert"></p>
           </div>
-          <button type="submit" class="btn-primary">Continuar</button>
+          <!-- Amazon repeats id="continue"; on a single-page doc we use its real sibling id="continue-announce" -->
+          <button type="submit" class="btn-primary" id="continue-announce">Continuar</button>
         </form>
         <div class="divider"></div>
         <p class="strong-line">Já é cliente?</p>
@@ -88,7 +89,7 @@
         <p class="legal">Ao criar uma conta, você concorda com os <a href="#">Termos de Uso</a> e o <a href="#">Aviso de Privacidade</a> da Aurora.</p>
       </section>
 
-      <!-- ===== STEP 4: captcha intro ===== -->
+      <!-- ===== STEP 4: captcha intro (Amazon: AWS WAF CAPTCHA — real widget lives in an iframe) ===== -->
       <section class="card hidden center-card" data-screen="4">
         <h1 class="h1-center">Resolva o quebra-cabeça para proteger sua conta</h1>
         <div class="puzzle-art" aria-hidden="true">
@@ -103,7 +104,7 @@
             <path d="M89 22v-3a3 3 0 016 0v3" stroke="#fff" stroke-width="1.6" fill="none"/>
           </svg>
         </div>
-        <button type="button" class="btn-primary" id="start-puzzle">Iniciar quebra-cabeça</button>
+        <button type="button" class="btn-primary" id="amzn-captcha-verify-button">Iniciar quebra-cabeça</button>
         <button type="button" class="icon-btn" aria-label="Áudio">🔊</button>
         <p class="alt-left"><a href="#">Precisa de ajuda?</a></p>
       </section>
@@ -119,7 +120,6 @@
             <span class="target-tag">Combine este!</span>
           </div>
           <div class="captcha-orbit" id="captcha-orbit">
-            <!-- icons placed by JS -->
             <div class="orbit-ring" data-ring="0"></div>
             <div class="orbit-ring" data-ring="1"></div>
             <div class="orbit-ring" data-ring="2"></div>
@@ -129,44 +129,44 @@
           </div>
         </div>
         <p class="error center" id="err-captcha"></p>
-        <button type="button" class="btn-primary" id="submit-puzzle">Enviar</button>
+        <button type="button" class="btn-primary" id="amzn-btn-verify-internal">Enviar</button>
         <div class="icon-row">
           <button type="button" class="icon-btn" aria-label="Áudio">🔊</button>
-          <button type="button" class="icon-btn" id="refresh-puzzle" aria-label="Recarregar">↻</button>
+          <button type="button" class="icon-btn" id="amzn-captcha-refresh-button" aria-label="Recarregar">↻</button>
         </div>
         <p class="alt-left"><a href="#">Precisa de ajuda?</a></p>
       </section>
 
-      <!-- ===== STEP 6: verify email OTP ===== -->
+      <!-- ===== STEP 6: verify email OTP (Amazon CVF) ===== -->
       <section class="card hidden" data-screen="6">
         <h1>Verificar endereço de e-mail</h1>
         <p class="sub">
           Para verificar seu e-mail, enviamos uma Senha de Uso Único (OTP) para
-          <strong id="otp-email-target">voce@exemplo.com</strong>
+          <strong id="cvf-account-claim">voce@exemplo.com</strong>
           <a href="#" class="change-link" data-goto="3">(Alterar)</a>
           <span class="demo" id="otp-email-debug"></span>
         </p>
-        <form id="form-6" novalidate>
+        <form id="verification-code-form" novalidate>
           <div class="field">
-            <label for="email-otp">Digite o código de segurança</label>
-            <input type="text" inputmode="numeric" maxlength="6" id="email-otp" autocomplete="one-time-code" />
-            <p class="error" id="err-email-otp"></p>
+            <label for="cvf-input-code">Digite o código de segurança</label>
+            <input type="text" inputmode="numeric" maxlength="6" id="cvf-input-code" name="code" autocomplete="one-time-code" />
+            <p class="error" id="cvf-input-code-alert"></p>
           </div>
-          <button type="submit" class="btn-primary">Verificar</button>
+          <button type="submit" class="btn-primary" id="cvf-submit-otp-button">Verificar</button>
         </form>
-        <p class="alt-left top-gap"><a href="#" id="resend-email">Reenviar código</a></p>
+        <p class="alt-left top-gap"><a href="#" id="cvf-resend-link">Reenviar código</a></p>
       </section>
 
-      <!-- ===== STEP 7: add mobile ===== -->
+      <!-- ===== STEP 7: add mobile (Amazon CVF — Add mobile number) ===== -->
       <section class="card hidden" data-screen="7">
         <p class="step-label">Etapa 1 de 2</p>
         <h1>Adicionar número de celular</h1>
         <p class="sub">Para reforçar a segurança da sua conta, adicione e verifique seu número de celular.</p>
-        <form id="form-7" novalidate>
+        <form id="cvf-add-phone-form" novalidate>
           <div class="phone-row">
             <div class="field country-field">
-              <label for="country">País</label>
-              <select id="country">
+              <label for="cvf-phone-country-code">País</label>
+              <select id="cvf-phone-country-code" name="countryCode">
                 <option value="+55">BR +55</option>
                 <option value="+1">US +1</option>
                 <option value="+351">PT +351</option>
@@ -174,34 +174,35 @@
               </select>
             </div>
             <div class="field grow">
-              <label for="mobile">Número de celular</label>
-              <input type="tel" id="mobile" inputmode="numeric" autocomplete="tel" />
+              <label for="ap_phone_number">Número de celular</label>
+              <input type="tel" id="ap_phone_number" name="phoneNumber" inputmode="numeric" autocomplete="tel" />
             </div>
           </div>
-          <p class="error" id="err-mobile"></p>
+          <p class="error" id="auth-phone-missing-alert"></p>
           <p class="legal small-legal">Ao cadastrar um celular, você consente em receber notificações automáticas de segurança por mensagem de texto da Aurora. Seu número não será compartilhado com terceiros para fins de marketing sem sua permissão. Podem ser aplicadas taxas de mensagem e dados.</p>
-          <button type="submit" class="btn-primary">Adicionar número de celular</button>
+          <button type="submit" class="btn-primary" id="cvf-submit-phone-button">Adicionar número de celular</button>
         </form>
       </section>
 
-      <!-- ===== STEP 8: mobile OTP ===== -->
+      <!-- ===== STEP 8: mobile OTP (Amazon CVF) ===== -->
       <section class="card hidden" data-screen="8">
         <h1>Adicionar número de celular</h1>
-        <p class="line-email"><span id="phone-target">+55...</span> <a href="#" class="change-link" data-goto="7">Alterar</a></p>
+        <p class="line-email"><span id="cvf-phone-display">+55...</span> <a href="#" class="change-link" data-goto="7">Alterar</a></p>
         <p class="sub">
           Enviamos uma Senha de Uso Único (OTP) para o seu telefone. Digite-a abaixo.
           <span class="demo" id="sms-otp-debug"></span>
         </p>
-        <form id="form-8" novalidate>
+        <form id="cvf-verify-phone-form" novalidate>
           <div class="field">
-            <label for="sms-otp">Digite o OTP</label>
-            <input type="text" inputmode="numeric" maxlength="6" id="sms-otp" autocomplete="one-time-code" />
-            <p class="error" id="err-sms-otp"></p>
+            <label for="cvf-input-code-phone">Digite o OTP</label>
+            <!-- Amazon reuses id="cvf-input-code"; disambiguated here for a single-page doc -->
+            <input type="text" inputmode="numeric" maxlength="6" id="cvf-input-code-phone" name="code" autocomplete="one-time-code" />
+            <p class="error" id="cvf-input-code-phone-alert"></p>
           </div>
-          <button type="submit" class="btn-primary">Criar sua conta Aurora</button>
+          <button type="submit" class="btn-primary" id="cvf-submit-create-account">Criar sua conta Aurora</button>
           <p class="legal">Ao criar uma conta, você concorda com os <a href="#">Termos de Uso</a> e o <a href="#">Aviso de Privacidade</a> da Aurora.</p>
         </form>
-        <p class="alt-left top-gap"><a href="#" id="resend-sms">Reenviar código</a></p>
+        <p class="alt-left top-gap"><a href="#" id="cvf-resend-link-phone">Reenviar código</a></p>
       </section>
 
       <!-- ===== SUCCESS ===== -->
