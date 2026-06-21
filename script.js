@@ -7,13 +7,43 @@
 
   var state = { login: "", name: "", phone: "", emailOtp: "", smsOtp: "" };
   function $(id) { return document.getElementById(id); }
-  var screens = Array.prototype.slice.call(document.querySelectorAll(".card[data-screen]"));
   var PROGRESS = { 1: 12, 2: 25, 3: 40, 4: 52, 5: 64, 6: 76, 7: 88, 8: 96, 9: 100 };
 
+  // Render ONE screen at a time in the DOM — like Amazon's page-per-step.
+  // This keeps generic selectors (input[type=submit], getByText, ...) unambiguous,
+  // exactly as they would be on a real single-page-per-step server flow.
+  var cardWrap = document.querySelector(".card-wrap");
+  var screenNodes = {};
+  Array.prototype.slice.call(document.querySelectorAll(".card[data-screen]")).forEach(function (s) {
+    screenNodes[+s.getAttribute("data-screen")] = s;
+  });
+
+  // Fill a screen's dynamic fields from state, AFTER it is attached to the DOM.
+  function populate(n) {
+    if (n === 2) { $("ap_email_display").textContent = state.login; }
+    if (n === 3) { $("ap_email").value = state.login; }
+    if (n === 6) {
+      $("cvf-account-claim").textContent = state.login;
+      $("otp-email-debug").textContent = state.emailOtp ? "Demo: seu código é " + state.emailOtp : "";
+    }
+    if (n === 8) {
+      $("cvf-phone-display").textContent = state.phone;
+      $("sms-otp-debug").textContent = state.smsOtp ? "Demo: seu OTP é " + state.smsOtp : "";
+    }
+    if (n === 9) { $("welcome-name").textContent = state.name.split(" ")[0] || state.name; }
+  }
+
   function show(n) {
-    screens.forEach(function (s) {
-      s.classList.toggle("hidden", +s.getAttribute("data-screen") !== n);
+    Object.keys(screenNodes).forEach(function (k) {
+      var node = screenNodes[k];
+      if (+k === n) {
+        node.classList.remove("hidden"); // drop the static initial-hidden class
+        if (!node.parentNode) cardWrap.appendChild(node);
+      } else if (node.parentNode) {
+        node.parentNode.removeChild(node);
+      }
     });
+    populate(n);
     $("progress-fill").style.width = (PROGRESS[n] || 12) + "%";
     window.scrollTo(0, 0);
   }
@@ -62,9 +92,7 @@
       return;
     }
     state.login = v;
-    $("ap_email_display").textContent = v;
-    $("ap_email").value = v;
-    show(2);
+    show(2); // populate() fills ap_email_display / ap_email from state
   });
 
   // ---------- Screen 2: confirm new ----------
@@ -100,8 +128,8 @@
 
   // ---------- Screen 4: captcha intro ----------
   $("amzn-captcha-verify-button").addEventListener("click", function () {
-    buildCaptcha();
-    show(5);
+    show(5);        // attach screen 5 first
+    buildCaptcha(); // then build (queries screen-5 elements)
   });
 
   // ---------- Screen 5: captcha challenge ----------
@@ -162,9 +190,7 @@
     }
     setError(null, "err-captcha", "");
     state.emailOtp = genOtp();
-    $("cvf-account-claim").textContent = state.login;
-    $("otp-email-debug").textContent = "Demo: seu código é " + state.emailOtp;
-    show(6);
+    show(6); // populate() fills cvf-account-claim / otp-email-debug from state
     $("cvf-input-code").focus();
   });
 
@@ -194,9 +220,7 @@
     setError("ap_phone_number", "auth-phone-missing-alert", "");
     state.phone = $("cvf-phone-country-code").value + " " + num;
     state.smsOtp = genOtp();
-    $("cvf-phone-display").textContent = state.phone;
-    $("sms-otp-debug").textContent = "Demo: seu OTP é " + state.smsOtp;
-    show(8);
+    show(8); // populate() fills cvf-phone-display / sms-otp-debug from state
     $("cvf-input-code-phone").focus();
   });
 
@@ -208,8 +232,7 @@
     if (v.length < 6) return setError("cvf-input-code-phone", "cvf-input-code-phone-alert", "Digite o código de 6 dígitos.");
     if (v !== state.smsOtp) return setError("cvf-input-code-phone", "cvf-input-code-phone-alert", "Código incorreto. Tente novamente.");
     setError("cvf-input-code-phone", "cvf-input-code-phone-alert", "");
-    $("welcome-name").textContent = state.name.split(" ")[0] || state.name;
-    show(9);
+    show(9); // populate() fills welcome-name from state
   });
   $("cvf-resend-link-phone").addEventListener("click", function (e) {
     e.preventDefault();
@@ -220,7 +243,10 @@
 
   // ---------- restart ----------
   $("restart-btn").addEventListener("click", function () {
-    document.querySelectorAll("form").forEach(function (f) { f.reset(); });
+    // Reset forms across all screens, including detached ones.
+    Object.keys(screenNodes).forEach(function (k) {
+      screenNodes[k].querySelectorAll("form").forEach(function (f) { f.reset(); });
+    });
     state = { login: "", name: "", phone: "", emailOtp: "", smsOtp: "" };
     show(1);
   });

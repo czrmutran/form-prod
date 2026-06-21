@@ -195,25 +195,64 @@ test("etapa 6: OTP de e-mail incorreto é rejeitado", async ({ page }) => {
 
 // ---- structure check: every primary button is a valid a-button -------------
 
-test("todos os a-button seguem a estrutura da Amazon", async ({ page }) => {
-  await page.goto(FILE_URL);
-  // Primary a-buttons only (the country-code a-button-dropdown is a different widget)
+// Validate the a-button(s) currently rendered (one screen is in the DOM at a time).
+async function assertAButtons(page, seen) {
   const wrappers = page.locator("span.a-button.a-button-primary");
   const count = await wrappers.count();
-  expect(count).toBe(9);
-
   for (let i = 0; i < count; i++) {
     const w = wrappers.nth(i);
     const id = await w.getAttribute("id");
     expect(id, "wrapper deve ter id").toBeTruthy();
-    // input sem id, com aria-labelledby = {id}-announce
     const input = w.locator("input.a-button-input");
     await expect(input).toHaveCount(1);
     expect(await input.getAttribute("id")).toBeNull();
     expect(await input.getAttribute("aria-labelledby")).toBe(`${id}-announce`);
-    // texto com id {id}-announce
     const textSpan = w.locator("span.a-button-text");
     await expect(textSpan).toHaveCount(1);
     expect(await textSpan.getAttribute("id")).toBe(`${id}-announce`);
+    seen.add(id);
   }
+}
+
+test("todos os a-button (em cada tela) seguem a estrutura da Amazon", async ({ page }) => {
+  const seen = new Set();
+  await page.goto(FILE_URL);
+  await assertAButtons(page, seen); // screen 1
+
+  await page.fill("#ap_email_login", "teste@email.com");
+  await aButton(page, "continue").click();
+  await assertAButtons(page, seen); // screen 2
+
+  await aButton(page, "ap_register_continue").click();
+  await assertAButtons(page, seen); // screen 3
+
+  await page.fill("#ap_customer_name", "Maria Silva");
+  await page.fill("#ap_password", "segredo123");
+  await page.fill("#ap_password_check", "segredo123");
+  await aButton(page, "continue-register").click();
+  await assertAButtons(page, seen); // screen 4
+
+  await aButton(page, "amzn-captcha-verify-button").click();
+  await assertAButtons(page, seen); // screen 5
+
+  await solveCaptcha(page);
+  await aButton(page, "amzn-btn-verify-internal").click();
+  await assertAButtons(page, seen); // screen 6
+
+  const emailOtp = await readDemoOtp(page, "otp-email-debug");
+  await page.fill("#cvf-input-code", emailOtp);
+  await aButton(page, "cvf-submit-otp-button").click();
+  await assertAButtons(page, seen); // screen 7
+
+  await page.fill("#ap_phone_number", "11999998888");
+  await aButton(page, "cvf-submit-phone-button").click();
+  await assertAButtons(page, seen); // screen 8
+
+  const smsOtp = await readDemoOtp(page, "sms-otp-debug");
+  await page.fill("#cvf-input-code-phone", smsOtp);
+  await aButton(page, "cvf-submit-create-account").click();
+  await assertAButtons(page, seen); // screen 9 (restart button)
+
+  // All 9 primary a-buttons were validated across the flow.
+  expect(seen.size).toBe(9);
 });
