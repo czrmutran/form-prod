@@ -35,7 +35,13 @@
             </div>
             <p class="error" id="auth-email-missing-alert"></p>
           </div>
-          <button type="submit" class="btn-primary" id="continue">Continuar</button>
+          <!-- Amazon a-button structure: wrapper id=continue, label id=continue-announce, input has no id -->
+          <span class="a-button a-button-primary" id="continue">
+            <span class="a-button-inner">
+              <input class="a-button-input" type="submit" aria-labelledby="continue-announce" />
+              <span class="a-button-text" id="continue-announce" aria-hidden="true">Continuar</span>
+            </span>
+          </span>
           <p class="legal">Ao continuar, você concorda com os <a href="#">Termos de Uso</a> e o <a href="#">Aviso de Privacidade</a> da Aurora.</p>
           <p class="alt-left"><a href="#">Precisa de ajuda?</a></p>
         </form>
@@ -49,7 +55,12 @@
         <h1>Parece que você é novo por aqui</h1>
         <p class="line-email"><span id="ap_email_display">voce@exemplo.com</span> <a href="#" class="change-link" data-goto="1">Alterar</a></p>
         <p class="sub">Vamos criar uma conta usando seu e-mail.</p>
-        <button type="button" class="btn-primary" id="ap_register_continue">Prosseguir para criar conta</button>
+        <span class="a-button a-button-primary" id="ap_register_continue">
+          <span class="a-button-inner">
+            <input class="a-button-input" type="button" aria-labelledby="ap_register_continue-announce" />
+            <span class="a-button-text" id="ap_register_continue-announce" aria-hidden="true">Prosseguir para criar conta</span>
+          </span>
+        </span>
         <div class="divider"></div>
         <p class="strong-line">Já é cliente?</p>
         <p class="alt-left"><a href="#" data-goto="1">Entrar com outro e-mail ou celular</a></p>
@@ -80,8 +91,14 @@
             <input type="password" id="ap_password_check" name="passwordCheck" autocomplete="new-password" />
             <p class="error" id="auth-password-mismatch-alert"></p>
           </div>
-          <!-- Amazon repeats id="continue"; on a single-page doc we use its real sibling id="continue-announce" -->
-          <button type="submit" class="btn-primary" id="continue-announce">Continuar</button>
+          <!-- Same a-button structure. Amazon's register page reuses id=continue/continue-announce on a
+               separate page load; in this single-page doc the ids are suffixed to stay valid (unique). -->
+          <span class="a-button a-button-primary" id="continue-register">
+            <span class="a-button-inner">
+              <input class="a-button-input" type="submit" aria-labelledby="continue-announce-register" />
+              <span class="a-button-text" id="continue-announce-register" aria-hidden="true">Continuar</span>
+            </span>
+          </span>
         </form>
         <div class="divider"></div>
         <p class="strong-line">Já é cliente?</p>
@@ -104,7 +121,12 @@
             <path d="M89 22v-3a3 3 0 016 0v3" stroke="#fff" stroke-width="1.6" fill="none"/>
           </svg>
         </div>
-        <button type="button" class="btn-primary" id="amzn-captcha-verify-button">Iniciar quebra-cabeça</button>
+        <span class="a-button a-button-primary" id="amzn-captcha-verify-button">
+          <span class="a-button-inner">
+            <input class="a-button-input" type="button" aria-labelledby="amzn-captcha-verify-button-announce" />
+            <span class="a-button-text" id="amzn-captcha-verify-button-announce" aria-hidden="true">Iniciar quebra-cabeça</span>
+          </span>
+        </span>
         <button type="button" class="icon-btn" aria-label="Áudio">🔊</button>
         <p class="alt-left"><a href="#">Precisa de ajuda?</a></p>
       </section>
@@ -129,7 +151,12 @@
           </div>
         </div>
         <p class="error center" id="err-captcha"></p>
-        <button type="button" class="btn-primary" id="amzn-btn-verify-internal">Enviar</button>
+        <span class="a-button a-button-primary" id="amzn-btn-verify-internal">
+          <span class="a-button-inner">
+            <input class="a-button-input" type="button" aria-labelledby="amzn-btn-verify-internal-announce" />
+            <span class="a-button-text" id="amzn-btn-verify-internal-announce" aria-hidden="true">Enviar</span>
+          </span>
+        </span>
         <div class="icon-row">
           <button type="button" class="icon-btn" aria-label="Áudio">🔊</button>
           <button type="button" class="icon-btn" id="amzn-captcha-refresh-button" aria-label="Recarregar">↻</button>
@@ -152,7 +179,12 @@
             <input type="text" inputmode="numeric" maxlength="6" id="cvf-input-code" name="code" autocomplete="one-time-code" />
             <p class="error" id="cvf-input-code-alert"></p>
           </div>
-          <button type="submit" class="btn-primary" id="cvf-submit-otp-button">Verificar</button>
+          <span class="a-button a-button-primary" id="cvf-submit-otp-button">
+            <span class="a-button-inner">
+              <input class="a-button-input" type="submit" aria-labelledby="cvf-submit-otp-button-announce" />
+              <span class="a-button-text" id="cvf-submit-otp-button-announce" aria-hidden="true">Verificar</span>
+            </span>
+          </span>
         </form>
         <p class="alt-left top-gap"><a href="#" id="cvf-resend-link">Reenviar código</a></p>
       </section>
@@ -180,7 +212,12 @@
           </div>
           <p class="error" id="auth-phone-missing-alert"></p>
           <p class="legal small-legal">Ao cadastrar um celular, você consente em receber notificações automáticas de segurança por mensagem de texto da Aurora. Seu número não será compartilhado com terceiros para fins de marketing sem sua permissão. Podem ser aplicadas taxas de mensagem e dados.</p>
-          <button type="submit" class="btn-primary" id="cvf-submit-phone-button">Adicionar número de celular</button>
+          <span class="a-button a-button-primary" id="cvf-submit-phone-button">
+            <span class="a-button-inner">
+              <input class="a-button-input" type="submit" aria-labelledby="cvf-submit-phone-button-announce" />
+              <span class="a-button-text" id="cvf-submit-phone-button-announce" aria-hidden="true">Adicionar número de celular</span>
+            </span>
+          </span>
         </form>
       </section>
 
@@ -195,11 +232,16 @@
         <form id="cvf-verify-phone-form" novalidate>
           <div class="field">
             <label for="cvf-input-code-phone">Digite o OTP</label>
-            <!-- Amazon reuses id="cvf-input-code"; disambiguated here for a single-page doc -->
+            <!-- Amazon reuses the email-OTP code field id on a separate page; suffixed here to stay unique -->
             <input type="text" inputmode="numeric" maxlength="6" id="cvf-input-code-phone" name="code" autocomplete="one-time-code" />
             <p class="error" id="cvf-input-code-phone-alert"></p>
           </div>
-          <button type="submit" class="btn-primary" id="cvf-submit-create-account">Criar sua conta Aurora</button>
+          <span class="a-button a-button-primary" id="cvf-submit-create-account">
+            <span class="a-button-inner">
+              <input class="a-button-input" type="submit" aria-labelledby="cvf-submit-create-account-announce" />
+              <span class="a-button-text" id="cvf-submit-create-account-announce" aria-hidden="true">Criar sua conta Aurora</span>
+            </span>
+          </span>
           <p class="legal">Ao criar uma conta, você concorda com os <a href="#">Termos de Uso</a> e o <a href="#">Aviso de Privacidade</a> da Aurora.</p>
         </form>
         <p class="alt-left top-gap"><a href="#" id="cvf-resend-link-phone">Reenviar código</a></p>
@@ -210,7 +252,12 @@
         <div class="tick">✓</div>
         <h1 class="h1-center">Tudo certo!</h1>
         <p class="sub center">Bem-vindo(a), <strong id="welcome-name">cliente</strong>. Sua conta Aurora está pronta.</p>
-        <button type="button" class="btn-primary" id="restart-btn">Começar agora</button>
+        <span class="a-button a-button-primary" id="restart-btn">
+          <span class="a-button-inner">
+            <input class="a-button-input" type="button" aria-labelledby="restart-btn-announce" />
+            <span class="a-button-text" id="restart-btn-announce" aria-hidden="true">Começar agora</span>
+          </span>
+        </span>
       </section>
     </div>
 

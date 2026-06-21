@@ -122,6 +122,27 @@ body {
 .btn-primary:hover { box-shadow: 0 12px 28px rgba(124,92,255,.5); }
 .btn-primary:active { transform: translateY(1px); }
 
+/* Amazon a-button structure (wrapper span + hidden submit input + text span) */
+.a-button {
+  position: relative; display: block; width: 100%; height: 48px; margin-top: 8px;
+  border: none; border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  box-shadow: 0 10px 22px rgba(124,92,255,.4);
+  cursor: pointer; transition: transform .1s, box-shadow .2s;
+}
+.a-button:hover { box-shadow: 0 12px 28px rgba(124,92,255,.5); }
+.a-button:active { transform: translateY(1px); }
+.a-button-inner { display: block; position: relative; height: 100%; }
+.a-button-input {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+.a-button-text {
+  display: flex; align-items: center; justify-content: center; height: 100%;
+  color: #fff; font-size: 15px; font-weight: 700; pointer-events: none;
+}
+
 .icon-btn {
   width: 44px; height: 38px; margin: 12px auto 0;
   border: 1.5px solid var(--line); border-radius: 10px;
