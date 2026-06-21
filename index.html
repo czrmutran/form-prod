@@ -35,11 +35,12 @@
             </div>
             <p class="error" id="auth-email-missing-alert"></p>
           </div>
-          <!-- Amazon a-button structure: wrapper id=continue, label id=continue-announce, input has no id -->
-          <span class="a-button a-button-primary" id="continue">
+          <!-- Exact Amazon a-button markup for the first-step Continue button -->
+          <span id="continue" class="a-button a-spacing-top-small a-button-span12 a-button-primary aok-relative">
             <span class="a-button-inner">
               <input class="a-button-input" type="submit" aria-labelledby="continue-announce" />
-              <span class="a-button-text" id="continue-announce" aria-hidden="true">Continuar</span>
+              <span id="continue-announce" class="a-button-text a-text-center" aria-hidden="true">
+                <span id="claim-submit-spinner" class="a-spinner a-spinner-medium aok-hidden"></span>Continuar</span>
             </span>
           </span>
           <p class="legal">Ao continuar, você concorda com os <a href="#">Termos de Uso</a> e o <a href="#">Aviso de Privacidade</a> da Aurora.</p>
@@ -95,8 +96,8 @@
                separate page load; in this single-page doc the ids are suffixed to stay valid (unique). -->
           <span class="a-button a-button-primary" id="continue-register">
             <span class="a-button-inner">
-              <input class="a-button-input" type="submit" aria-labelledby="continue-announce-register" />
-              <span class="a-button-text" id="continue-announce-register" aria-hidden="true">Continuar</span>
+              <input class="a-button-input" type="submit" aria-labelledby="continue-register-announce" />
+              <span class="a-button-text" id="continue-register-announce" aria-hidden="true">Continuar</span>
             </span>
           </span>
         </form>

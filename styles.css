@@ -143,6 +143,11 @@ body {
   color: #fff; font-size: 15px; font-weight: 700; pointer-events: none;
 }
 
+/* Amazon utility classes carried over with the exact markup */
+.aok-hidden { display: none !important; }
+.aok-relative { position: relative; }
+.a-text-center { text-align: center; }
+
 .icon-btn {
   width: 44px; height: 38px; margin: 12px auto 0;
   border: 1.5px solid var(--line); border-radius: 10px;
