@@ -235,4 +235,57 @@ a:hover { text-decoration: underline; }
 .foot a:hover { color: #fff; }
 .foot span { color: rgba(255,255,255,.45); font-size: 12px; }
 
+/* ===== Amazon claim-collection (step 1) literal classes, themed for Aurora ===== */
+#claim-collection-container h1.a-size-medium-plus { font-size: 24px; font-weight: 800; margin: 0 0 10px; line-height: 1.2; }
+.a-spacing-none { margin: 0; }
+.a-spacing-micro { margin-bottom: 6px; }
+.a-spacing-small { margin-bottom: 10px; }
+.a-spacing-base { margin-bottom: 14px; }
+.a-spacing-top-small { margin-top: 10px; }
+.a-spacing-top-medium { margin-top: 16px; }
+.a-text-bold { font-weight: 700; }
+p.a-text-bold { font-size: 13px; }
+.a-size-small { font-size: 12px; }
+
+#claim-input-container { position: relative; display: flex; align-items: stretch; }
+.a-input-text {
+  flex: 1; width: 100%; height: 46px; padding: 0 40px 0 14px;
+  border: 1.5px solid var(--line); border-radius: 11px;
+  font-size: 15px; background: #fbfbfe; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.a-input-text:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(124,92,255,.15); background: #fff; }
+.clear-text-field-button {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  border: none; background: none; cursor: pointer; padding: 6px; line-height: 0;
+}
+.a-icon-close::before { content: "✕"; color: var(--muted); font-size: 14px; }
+.clear-text-field-button:hover .a-icon-close::before { color: var(--text); }
+
+/* country dropdown (hidden until a phone number is detected, like Amazon) */
+.a-dropdown-container { display: inline-flex; }
+.a-button-dropdown {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 46px; padding: 0 10px; margin-right: 8px;
+  border: 1.5px solid var(--line); border-radius: 11px; background: #fbfbfe;
+}
+.a-dropdown-prompt { font-size: 14px; }
+.a-icon-dropdown::before { content: "▾"; color: var(--muted); margin-left: 2px; }
+
+/* inline alert boxes */
+.a-box.a-alert-inline { border: 1.5px solid var(--danger); border-radius: 10px; background: rgba(229,72,77,.08); }
+.a-alert-inline .a-alert-container { display: flex; align-items: center; gap: 8px; padding: 8px 12px; }
+.a-icon-alert::before { content: "⚠"; color: var(--danger); }
+.a-alert-content { color: var(--danger); font-size: 12.5px; }
+.a-alert-error { border-color: var(--danger); }
+
+/* legal text, list, links, divider */
+.legal-text { font-size: 12px; color: var(--muted); }
+.legal-text a { color: var(--accent); font-weight: 600; }
+.a-unordered-list.a-nostyle { list-style: none; padding: 0; margin: 8px 0 0; }
+.a-vertical .a-list-item { font-size: 14px; }
+.a-link-normal { color: var(--accent); font-weight: 600; }
+.a-divider-normal { border: none; border-top: 1px solid var(--line); margin: 20px 0 14px; }
+#ab-registration-link-section .a-text-bold { font-size: 14px; }
+
 .hidden { display: none !important; }

@@ -112,23 +112,24 @@ test("barra de progresso avança ao longo do fluxo", async ({ page }) => {
 test("etapa 1: e-mail vazio mostra erro e não avança", async ({ page }) => {
   await page.goto(FILE_URL);
   await aButton(page, "continue").click();
-  await expect(page.locator("#auth-email-missing-alert")).toBeVisible();
+  await expect(page.locator("#empty-claim-alert")).toBeVisible();
   await expect(screen(page, 1)).toBeVisible();
   await expect(screen(page, 2)).toBeHidden();
 });
 
 test("etapa 1: e-mail inválido mostra erro", async ({ page }) => {
   await page.goto(FILE_URL);
-  await page.fill("#ap_email_login", "naoehemail");
+  await page.fill("#ap_email_login", "naoeh@email");
   await aButton(page, "continue").click();
-  await expect(page.locator("#auth-email-missing-alert")).toContainText("inválido");
+  await expect(page.locator("#invalid-email-alert")).toBeVisible();
+  await expect(page.locator("#invalid-email-alert")).toContainText("Invalid email");
   await expect(screen(page, 2)).toBeHidden();
 });
 
 test("etapa 1: botão limpar (✕) esvazia o campo", async ({ page }) => {
   await page.goto(FILE_URL);
   await page.fill("#ap_email_login", "teste@email.com");
-  await page.locator("#ap_email_login_clear").click();
+  await page.locator("#claim-input-clear-button").click();
   await expect(page.locator("#ap_email_login")).toHaveValue("");
 });
 
@@ -196,7 +197,8 @@ test("etapa 6: OTP de e-mail incorreto é rejeitado", async ({ page }) => {
 
 test("todos os a-button seguem a estrutura da Amazon", async ({ page }) => {
   await page.goto(FILE_URL);
-  const wrappers = page.locator("span.a-button");
+  // Primary a-buttons only (the country-code a-button-dropdown is a different widget)
+  const wrappers = page.locator("span.a-button.a-button-primary");
   const count = await wrappers.count();
   expect(count).toBe(9);
 

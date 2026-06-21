@@ -23,32 +23,90 @@
     <div class="card-wrap">
       <div class="progress"><span id="progress-fill"></span></div>
 
-      <!-- ===== STEP 1: enter email/mobile (Amazon: /ap/signin email-first) ===== -->
+      <!-- ===== STEP 1: literal copy of Amazon's claim-collection-container (/ap/signin) ===== -->
       <section class="card" data-screen="1">
-        <h1>Entrar ou criar conta</h1>
-        <form id="ap_signin_form" novalidate>
-          <div class="field">
-            <label for="ap_email_login">Número de celular ou e-mail</label>
-            <div class="clear-wrap">
-              <input type="text" id="ap_email_login" name="email" autocomplete="email" />
-              <button type="button" class="clear-btn" id="ap_email_login_clear" aria-label="Limpar">✕</button>
+        <div id="claim-collection-container" aria-live="polite" class="a-section a-spacing-none">
+          <noscript>
+            <div id="auth-js-alert-box" class="a-box a-alert a-alert-error a-spacing-base" role="alert">
+              <div class="a-box-inner a-alert-container"><i class="a-icon a-icon-alert" aria-hidden="true"></i>
+                <div class="a-alert-content">This site requires JavaScript to function correctly. Please enable JavaScript on your browser to continue.</div>
+              </div>
             </div>
-            <p class="error" id="auth-email-missing-alert"></p>
-          </div>
-          <!-- Exact Amazon a-button markup for the first-step Continue button -->
-          <span id="continue" class="a-button a-spacing-top-small a-button-span12 a-button-primary aok-relative">
-            <span class="a-button-inner">
-              <input class="a-button-input" type="submit" aria-labelledby="continue-announce" />
-              <span id="continue-announce" class="a-button-text a-text-center" aria-hidden="true">
-                <span id="claim-submit-spinner" class="a-spinner a-spinner-medium aok-hidden"></span>Continuar</span>
-            </span>
+          </noscript>
+          <h1 class="a-size-medium-plus a-spacing-small">Sign in or create account</h1>
+          <p class="a-spacing-micro a-text-bold">Enter mobile number or email</p>
+          <span class="a-declarative" data-action="submit-claim" data-submit-claim="{}">
+            <form id="ap_login_form" name="signIn" method="post" novalidate action="#">
+              <input type="hidden" name="appAction" value="SIGNIN_CLAIM_COLLECT" />
+              <input type="hidden" name="subPageType" value="FullPageUnifiedClaimCollect" />
+              <input type="hidden" name="claimCollectionWorkflow" value="unified" />
+              <input type="hidden" name="metadata1" value="" /><!-- placeholder: real value is a session-specific token -->
+              <input type="hidden" name="claimType" />
+              <input type="hidden" name="countryCode" />
+              <input type="hidden" name="isServerSideRouting" value="true" />
+              <input type="hidden" name="unifiedAuthTreatment" value="T2" />
+              <input type="hidden" name="signalUnknownCredentialUnifiedAuthWeblabActive" value="false" />
+              <input type="hidden" name="anti-csrftoken-a2z" value="" /><!-- placeholder: real CSRF token is session-specific -->
+              <div id="claim-input-container" class="a-section a-spacing-micro a-form-focus">
+                <span class="a-dropdown-container">
+                  <!-- Amazon's full list has ~250 options; truncated here to a representative subset -->
+                  <select name="" autocomplete="off" role="combobox" data-a-native-class="aok-hidden" data-a-touch-header="Country/region code" id="claim-input-dropdown-select-element" tabindex="0" data-action="a-dropdown-select" class="a-native-dropdown a-declarative aok-hidden">
+                    <option data-calling-code="55" data-country-code="BR" value="BR" data-a-html-content="Brazil &lt;span dir='ltr'&gt;+55&lt;/span&gt;">BR +55</option>
+                    <option data-calling-code="1" data-country-code="US" value="US" data-a-html-content="United States &lt;span dir='ltr'&gt;+1&lt;/span&gt;" selected="">US +1</option>
+                    <option data-calling-code="44" data-country-code="GB" value="GB" data-a-html-content="United Kingdom &lt;span dir='ltr'&gt;+44&lt;/span&gt;">GB +44</option>
+                    <option data-calling-code="351" data-country-code="PT" value="PT" data-a-html-content="Portugal &lt;span dir='ltr'&gt;+351&lt;/span&gt;">PT +351</option>
+                    <option data-calling-code="1" data-country-code="CA" value="CA" data-a-html-content="Canada &lt;span dir='ltr'&gt;+1&lt;/span&gt;">CA +1</option>
+                    <option data-calling-code="61" data-country-code="AU" value="AU" data-a-html-content="Australia &lt;span dir='ltr'&gt;+61&lt;/span&gt;">AU +61</option>
+                    <option data-calling-code="49" data-country-code="DE" value="DE" data-a-html-content="Germany &lt;span dir='ltr'&gt;+49&lt;/span&gt;">DE +49</option>
+                    <option data-calling-code="33" data-country-code="FR" value="FR" data-a-html-content="France &lt;span dir='ltr'&gt;+33&lt;/span&gt;">FR +33</option>
+                    <option data-calling-code="91" data-country-code="IN" value="IN" data-a-html-content="India &lt;span dir='ltr'&gt;+91&lt;/span&gt;">IN +91</option>
+                    <option data-calling-code="81" data-country-code="JP" value="JP" data-a-html-content="Japan &lt;span dir='ltr'&gt;+81&lt;/span&gt;">JP +81</option>
+                  </select>
+                  <span tabindex="-1" id="claim-input-dropdown" data-a-class="aok-hidden" class="a-button a-button-dropdown aok-hidden" aria-hidden="true" style="min-width: 0.949416%;">
+                    <span class="a-button-inner">
+                      <span class="a-button-text a-declarative" data-action="a-dropdown-button" aria-hidden="true">
+                        <span class="a-dropdown-prompt">US +1</span>
+                      </span>
+                      <i class="a-icon a-icon-dropdown"></i>
+                    </span>
+                  </span>
+                </span>
+                <input type="email" id="ap_email_login" autocomplete="username" name="email" class="a-input-text" data-tablayoutweblabtreatment="false" aria-label="Enter mobile number or email" />
+                <button id="claim-input-clear-button" class="clear-text-field-button" type="button" style="display: inline-block;"><i class="a-icon a-icon-close" role="presentation"></i></button>
+              </div>
+              <input type="password" maxlength="1024" id="auth-credential-autofill-hint" name="password" class="a-input-text aok-hidden" />
+              <div id="empty-claim-alert" class="a-box a-alert-inline a-alert-inline-error aok-hidden a-spacing-top-small" role="alert">
+                <div class="a-box-inner a-alert-container"><i class="a-icon a-icon-alert" aria-hidden="true"></i><div class="a-alert-content">Enter your mobile number or email</div></div>
+              </div>
+              <div id="invalid-phone-alert" class="a-box a-alert-inline a-alert-inline-error aok-hidden a-spacing-top-small" role="alert">
+                <div class="a-box-inner a-alert-container"><i class="a-icon a-icon-alert" aria-hidden="true"></i><div class="a-alert-content">Invalid mobile number</div></div>
+              </div>
+              <div id="invalid-email-alert" class="a-box a-alert-inline a-alert-inline-error aok-hidden a-spacing-top-small" role="alert">
+                <div class="a-box-inner a-alert-container"><i class="a-icon a-icon-alert" aria-hidden="true"></i><div class="a-alert-content">Invalid email address</div></div>
+              </div>
+              <div id="error-alert" class="a-box a-alert-inline a-alert-inline-error aok-hidden a-spacing-top-small" role="alert">
+                <div class="a-box-inner a-alert-container"><i class="a-icon a-icon-alert" aria-hidden="true"></i><div class="a-alert-content">Something’s not right. Try again.</div></div>
+              </div>
+              <span id="continue" class="a-button a-spacing-top-small a-button-span12 a-button-primary aok-relative">
+                <span class="a-button-inner">
+                  <input class="a-button-input" type="submit" aria-labelledby="continue-announce" />
+                  <span id="continue-announce" class="a-button-text a-text-center" aria-hidden="true"><span id="claim-submit-spinner" class="a-spinner a-spinner-medium aok-hidden"></span>Continue</span>
+                </span>
+              </span>
+            </form>
           </span>
-          <p class="legal">Ao continuar, você concorda com os <a href="#">Termos de Uso</a> e o <a href="#">Aviso de Privacidade</a> da Aurora.</p>
-          <p class="alt-left"><a href="#">Precisa de ajuda?</a></p>
-        </form>
-        <div class="divider"></div>
-        <p class="strong-line">Comprando para o trabalho?</p>
-        <p class="alt-left"><a href="#">Criar uma conta empresarial gratuita</a></p>
+          <p class="a-spacing-top-medium a-size-small legal-text">By continuing, you agree to Amazon's <a href="#">Conditions of Use</a> and <a href="#">Privacy Notice</a>.</p>
+          <div class="a-section">
+            <ul class="a-unordered-list a-nostyle a-vertical">
+              <li><span class="a-list-item"><a class="a-size-base a-link-normal" target="_blank" rel="noopener noopener" href="#" role="button">Need help?</a></span></li>
+            </ul>
+          </div>
+          <div id="ab-registration-link-section" class="a-section">
+            <hr aria-hidden="true" class="a-divider-normal" />
+            <div class="a-section a-spacing-micro"><span class="a-text-bold">Buying for work?</span></div>
+            <a id="ab-registration-ingress-link" class="a-link-normal" href="#"><span>Create a free business account</span></a>
+          </div>
+        </div>
       </section>
 
       <!-- ===== STEP 2: new user confirm ===== -->

