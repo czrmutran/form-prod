@@ -288,11 +288,16 @@ p.a-text-bold { font-size: 13px; }
 .a-divider-normal { border: none; border-top: 1px solid var(--line); margin: 20px 0 14px; }
 #ab-registration-link-section .a-text-bold { font-size: 14px; }
 
-/* AWS WAF CAPTCHA iframe host (step 4) */
-.captcha-frame {
-  width: 100%; min-height: 340px; border: none; display: block;
-  background: #fff; border-radius: 8px;
-}
+/* Arkose (aacb) captcha container — step 4, literal Amazon structure */
+#aacb-captcha-header { font-size: 22px; font-weight: 800; margin: 0 0 14px; line-height: 1.2; text-align: center; }
+#aacb-arkose-elements { display: flex; flex-direction: column; align-items: center; }
+.aacb-captcha-iframe { border: none; display: block; margin: 0 auto; max-width: 100%; background: #fff; border-radius: 8px; }
+#aa_arkose_customer_support_link { color: var(--accent); font-weight: 600; font-size: 14px; }
+.aacb-overflow-hidden { overflow: hidden; }
+.a-padding-extra-large { padding: 4px 0; }
+.a-text-left { text-align: left; }
+.a-spacing-mini { margin-bottom: 8px; }
+.a-spacing-base { margin-bottom: 14px; }
 
 /* ===== AWS WAF CAPTCHA "home" screen (step 4) — literal structure, Aurora theme ===== */
 .home.box.screen { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 6px 0; }

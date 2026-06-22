@@ -22,9 +22,9 @@ async function readDemoOtp(page, debugId) {
   return m[1];
 }
 
-// The captcha lives inside the AWS WAF iframe (like the official site).
+// The challenge lives inside the nested Arkose iframe (like the official site).
 function captchaFrame(page) {
-  return page.frameLocator("#aws-waf-captcha");
+  return page.frameLocator("#aacb-arkose-frame");
 }
 
 // Inside the iframe: Start Puzzle, move the icon onto the target orbit, Submit.

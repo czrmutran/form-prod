@@ -126,14 +126,46 @@
     show(4); // -> captcha intro
   });
 
-  // ---------- Screen 4: AWS WAF CAPTCHA hosted in an iframe (captcha.html) ----------
-  // The captcha runs inside the iframe and postMessages the parent when solved,
-  // mirroring the real AWS WAF token callback.
-  window.addEventListener("message", function (e) {
-    if (e && e.data && e.data.type === "captcha-solved") {
-      state.emailOtp = genOtp();
-      show(6); // populate() fills cvf-account-claim / otp-email-debug from state
-      $("cvf-input-code").focus();
+  // ---------- Screen 4: Arkose (aacb) captcha relay — mirrors Amazon's /ap/cvf/request ----------
+  // The challenge runs inside the nested iframe (#aacb-arkose-frame) and posts
+  // challenge-* events; this parent relays them as aa-challenge-* (postChallengeEvent),
+  // exactly like the official page, and advances the flow on challenge-complete.
+  function postChallengeEvent(eventId, payload) {
+    var message = payload
+      ? JSON.stringify({ eventId: eventId, payload: payload })
+      : JSON.stringify({ eventId: eventId });
+    window.postMessage(message, "*");
+    if (window !== parent) parent.postMessage(message, "*");
+  }
+
+  function generateCustomerSupportPage() {
+    var link = $("aa_arkose_customer_support_link");
+    if (link) link.addEventListener("click", function (e) { e.preventDefault(); });
+    return false;
+  }
+  generateCustomerSupportPage();
+
+  window.addEventListener("message", function (event) {
+    var data;
+    try { data = JSON.parse(event.data); } catch (ex) { return; }
+    if (!data || !data.eventId) return;
+    switch (data.eventId) {
+      case "challenge-shown":
+        postChallengeEvent("aa-challenge-shown", data.payload);
+        break;
+      case "challenge-loaded": {
+        var sp = $("aacb-arkose-spinner");
+        if (sp) sp.style.display = "none";
+        postChallengeEvent("aa-challenge-loaded", data.payload);
+        break;
+      }
+      case "challenge-complete":
+        postChallengeEvent("aa-challenge-complete", data.payload);
+        // Advance the create-account flow (the real flow would carry the Arkose token).
+        state.emailOtp = genOtp();
+        show(6); // populate() fills cvf-account-claim / otp-email-debug from state
+        $("cvf-input-code").focus();
+        break;
     }
   });
 

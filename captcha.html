@@ -116,11 +116,19 @@
         placeIcon();
       }
 
+      // Arkose-style event protocol: notify the parent (aacb relay) of state changes.
+      function post(eventId, payload) {
+        window.parent.postMessage(JSON.stringify({ eventId: eventId, payload: payload || {} }), "*");
+      }
+      // Challenge "iframe" finished loading.
+      post("challenge-loaded", { frameHeight: 290, frameWidth: 302 });
+
       // Home -> challenge
       document.querySelector('[data-theme="home.verifyButton"]').addEventListener("click", function () {
         $("captcha-home").classList.add("hidden");
         $("captcha-challenge").classList.remove("hidden");
         buildCaptcha();
+        post("challenge-shown");
       });
 
       $("orbit-left").addEventListener("click", function () { captcha.current = (captcha.current - 1 + SLOTS) % SLOTS; placeIcon(); });
@@ -133,8 +141,8 @@
           return;
         }
         setError("");
-        // Tell the parent page the captcha was solved (like the real WAF token callback).
-        window.parent.postMessage({ type: "captcha-solved" }, "*");
+        // Tell the parent (aacb relay) the challenge is complete — like Arkose's token callback.
+        post("challenge-complete", { token: "demo-arkose-token" });
       });
     })();
   </script>

