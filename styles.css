@@ -288,4 +288,18 @@ p.a-text-bold { font-size: 13px; }
 .a-divider-normal { border: none; border-top: 1px solid var(--line); margin: 20px 0 14px; }
 #ab-registration-link-section .a-text-bold { font-size: 14px; }
 
+/* ===== AWS WAF CAPTCHA "home" screen (step 4) — literal structure, Aurora theme ===== */
+.home.box.screen { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 6px 0; }
+.home .logo { width: 96px; height: auto; margin: 4px 0 16px; }
+[data-theme="home.title"] { font-size: 22px; font-weight: 800; margin: 0 0 8px; }
+[data-theme="home.instructions"] { font-size: 14px; color: var(--muted); margin: 0 0 22px; line-height: 1.5; }
+[data-theme="home.verifyButton"] {
+  width: 100%; height: 48px; border: none; border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 10px 22px rgba(124,92,255,.4); transition: transform .1s, box-shadow .2s;
+}
+[data-theme="home.verifyButton"]:hover { box-shadow: 0 12px 28px rgba(124,92,255,.5); }
+[data-theme="home.verifyButton"]:active { transform: translateY(1px); }
+
 .hidden { display: none !important; }

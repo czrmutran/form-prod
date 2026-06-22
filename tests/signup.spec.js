@@ -60,7 +60,7 @@ async function reachEmailOtpVerified(page) {
   await expect(screen(page, 4)).toBeVisible();
 
   // Screen 4 -> captcha
-  await aButton(page, "amzn-captcha-verify-button").click();
+  await page.getByRole("button", { name: "Start Puzzle" }).click();
   await expect(screen(page, 5)).toBeVisible();
 
   // Screen 5 captcha
@@ -163,7 +163,7 @@ test("etapa 5: captcha na posição errada mostra erro", async ({ page }) => {
   await page.fill("#ap_password", "segredo123");
   await page.fill("#ap_password_check", "segredo123");
   await aButton(page, "continue-register").click();
-  await aButton(page, "amzn-captcha-verify-button").click();
+  await page.getByRole("button", { name: "Start Puzzle" }).click();
   await expect(screen(page, 5)).toBeVisible();
 
   // submete sem alinhar (estado inicial começa longe do alvo)
@@ -182,7 +182,7 @@ test("etapa 6: OTP de e-mail incorreto é rejeitado", async ({ page }) => {
   await page.fill("#ap_password", "segredo123");
   await page.fill("#ap_password_check", "segredo123");
   await aButton(page, "continue-register").click();
-  await aButton(page, "amzn-captcha-verify-button").click();
+  await page.getByRole("button", { name: "Start Puzzle" }).click();
   await solveCaptcha(page);
   await aButton(page, "amzn-btn-verify-internal").click();
   await expect(screen(page, 6)).toBeVisible();
@@ -230,9 +230,9 @@ test("todos os a-button (em cada tela) seguem a estrutura da Amazon", async ({ p
   await page.fill("#ap_password", "segredo123");
   await page.fill("#ap_password_check", "segredo123");
   await aButton(page, "continue-register").click();
-  await assertAButtons(page, seen); // screen 4
+  await assertAButtons(page, seen); // screen 4 (Start Puzzle is a WAF <button>, not an a-button)
 
-  await aButton(page, "amzn-captcha-verify-button").click();
+  await page.getByRole("button", { name: "Start Puzzle" }).click();
   await assertAButtons(page, seen); // screen 5
 
   await solveCaptcha(page);
@@ -253,6 +253,6 @@ test("todos os a-button (em cada tela) seguem a estrutura da Amazon", async ({ p
   await aButton(page, "cvf-submit-create-account").click();
   await assertAButtons(page, seen); // screen 9 (restart button)
 
-  // All 9 primary a-buttons were validated across the flow.
-  expect(seen.size).toBe(9);
+  // 8 primary a-buttons validated (step 4 uses the AWS WAF <button>, not an a-button).
+  expect(seen.size).toBe(8);
 });

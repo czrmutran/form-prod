@@ -126,8 +126,8 @@
     show(4); // -> captcha intro
   });
 
-  // ---------- Screen 4: captcha intro ----------
-  $("amzn-captcha-verify-button").addEventListener("click", function () {
+  // ---------- Screen 4: AWS WAF CAPTCHA home (Start Puzzle button, no id) ----------
+  document.querySelector('[data-theme="home.verifyButton"]').addEventListener("click", function () {
     show(5);        // attach screen 5 first
     buildCaptcha(); // then build (queries screen-5 elements)
   });
