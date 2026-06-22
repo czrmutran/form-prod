@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS WAF Captcha</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* The captcha lives in its own document (iframe), like the real AWS WAF widget. */
+    body { background: #fff; margin: 0; padding: 18px 16px; color: var(--text); }
+    .frame-card { max-width: 360px; margin: 0 auto; text-align: center; }
+    .frame-screen.hidden { display: none !important; }
+    .frame-screen .heading { font-size: 22px; font-weight: 800; margin: 4px 0 8px; }
+    [data-theme="challenge.verifyButton"] {
+      width: 100%; height: 48px; margin-top: 12px; border: none; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 10px 22px rgba(124,92,255,.4);
+    }
+    [data-theme="challenge.verifyButton"]:active { transform: translateY(1px); }
+  </style>
+</head>
+<body>
+  <div class="frame-card">
+    <!-- ===== HOME (Start Puzzle) — literal AWS WAF structure ===== -->
+    <div id="captcha-home" class="frame-screen">
+      <div class="sc-99cwso-0 sc-11w6f91-0 fcBZbp eWRcSj home box screen">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 64 64" width="84" height="84" fill="none">
+            <ellipse cx="30" cy="34" rx="26" ry="17" fill="#fce8f3"/>
+            <rect x="14" y="16" width="13" height="13" rx="3" fill="#a8dfee" stroke="#231f20" stroke-width="1.4" transform="rotate(-10 20 22)"/>
+            <rect x="29" y="14" width="13" height="13" rx="3" fill="#a8dfee" stroke="#231f20" stroke-width="1.4"/>
+            <rect x="16" y="32" width="13" height="13" rx="3" fill="#a8dfee" stroke="#231f20" stroke-width="1.4"/>
+            <rect x="31" y="32" width="13" height="13" rx="3" fill="#a8dfee" stroke="#231f20" stroke-width="1.4"/>
+            <circle cx="50" cy="18" r="12" fill="#ffc50d" stroke="#232f3e" stroke-width="1.4"/>
+            <rect x="44" y="16" width="12" height="9" rx="1.5" fill="#e9f7fb" stroke="#232f3e" stroke-width="1.2"/>
+            <path d="M47 16v-2a3 3 0 016 0v2" stroke="#232f3e" stroke-width="1.4" fill="none"/>
+          </svg>
+        </span>
+        <h2 font-size="1.5" tabindex="-1" data-theme="home.title" class="sc-1io4bok-0 gdVRUf heading text">Protecting your account</h2>
+        <p tabindex="-1" data-theme="home.instructions" class="sc-1io4bok-0 KalLU sc-d5trka-0 text">Please solve this puzzle so we know you are a real person</p>
+        <button aria-label="Start Puzzle" aria-description="Visual challenge. Audio challenge is available below, compatible with screen reader software." class="sc-nkuzb1-0 sc-d5trka-0 eZxMRy button" data-theme="home.verifyButton">Start Puzzle</button>
+      </div>
+    </div>
+
+    <!-- ===== CHALLENGE (orbit puzzle) ===== -->
+    <div id="captcha-challenge" class="frame-screen hidden">
+      <h2 class="heading text">Solve this puzzle to protect your account</h2>
+      <p class="sub center">Use the arrows to move the icon into the indicated orbit. (1 of 1)</p>
+      <div class="captcha-stage">
+        <div class="captcha-target">
+          <span class="target-num" id="target-num">17</span>
+          <span class="target-icon" id="target-icon">🏆</span>
+          <span class="target-tag">Match This!</span>
+        </div>
+        <div class="captcha-orbit" id="captcha-orbit">
+          <div class="orbit-ring" data-ring="0"></div>
+          <div class="orbit-ring" data-ring="1"></div>
+          <div class="orbit-ring" data-ring="2"></div>
+          <div class="orbit-icon" id="orbit-icon">🏆</div>
+          <button type="button" class="orbit-arrow left" id="orbit-left" aria-label="Left">←</button>
+          <button type="button" class="orbit-arrow right" id="orbit-right" aria-label="Right">→</button>
+        </div>
+      </div>
+      <p class="error center" id="err-captcha"></p>
+      <button aria-label="Submit" data-theme="challenge.verifyButton">Submit</button>
+      <div class="icon-row">
+        <button type="button" class="icon-btn" aria-label="Audio">🔊</button>
+        <button type="button" class="icon-btn" id="amzn-captcha-refresh-button" aria-label="Reload">↻</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+      function $(id) { return document.getElementById(id); }
+      var ICONS = ["🏆", "🔔", "📷", "🎧", "🚀", "🎲", "🔑", "⭐"];
+      var SLOTS = 8, RADIUS = 52, CENTER = 75;
+      var captcha = { current: 0, target: 0 };
+
+      function slotPos(i) {
+        var ang = (-90 + i * (360 / SLOTS)) * Math.PI / 180;
+        return { x: CENTER + RADIUS * Math.cos(ang), y: CENTER + RADIUS * Math.sin(ang) };
+      }
+      function placeIcon() {
+        var p = slotPos(captcha.current);
+        $("orbit-icon").style.left = p.x + "px";
+        $("orbit-icon").style.top = p.y + "px";
+      }
+      function setError(msg) {
+        var e = $("err-captcha");
+        if (msg) { e.textContent = msg; e.classList.add("show"); }
+        else { e.textContent = ""; e.classList.remove("show"); }
+      }
+      function buildCaptcha() {
+        var orbit = $("captcha-orbit");
+        orbit.querySelectorAll(".orbit-slot").forEach(function (n) { n.remove(); });
+        captcha.target = Math.floor(Math.random() * SLOTS);
+        captcha.current = (captcha.target + 3 + Math.floor(Math.random() * 3)) % SLOTS;
+        var icon = ICONS[Math.floor(Math.random() * ICONS.length)];
+        $("target-icon").textContent = icon;
+        $("orbit-icon").textContent = icon;
+        $("target-num").textContent = Math.floor(10 + Math.random() * 89);
+        for (var i = 0; i < SLOTS; i++) {
+          var p = slotPos(i);
+          var slot = document.createElement("div");
+          slot.className = "orbit-slot" + (i === captcha.target ? " is-target" : "");
+          slot.style.left = p.x + "px";
+          slot.style.top = p.y + "px";
+          slot.style.background = i === captcha.target ? "rgba(229,72,77,.15)" : "rgba(255,255,255,.06)";
+          slot.textContent = i === captcha.target ? "◎" : "";
+          orbit.appendChild(slot);
+        }
+        setError("");
+        placeIcon();
+      }
+
+      // Home -> challenge
+      document.querySelector('[data-theme="home.verifyButton"]').addEventListener("click", function () {
+        $("captcha-home").classList.add("hidden");
+        $("captcha-challenge").classList.remove("hidden");
+        buildCaptcha();
+      });
+
+      $("orbit-left").addEventListener("click", function () { captcha.current = (captcha.current - 1 + SLOTS) % SLOTS; placeIcon(); });
+      $("orbit-right").addEventListener("click", function () { captcha.current = (captcha.current + 1) % SLOTS; placeIcon(); });
+      $("amzn-captcha-refresh-button").addEventListener("click", buildCaptcha);
+
+      document.querySelector('[data-theme="challenge.verifyButton"]').addEventListener("click", function () {
+        if (captcha.current !== captcha.target) {
+          setError("Incorrect position. Move the icon onto the highlighted orbit.");
+          return;
+        }
+        setError("");
+        // Tell the parent page the captcha was solved (like the real WAF token callback).
+        window.parent.postMessage({ type: "captcha-solved" }, "*");
+      });
+    })();
+  </script>
+</body>
+</html>

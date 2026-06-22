@@ -288,6 +288,12 @@ p.a-text-bold { font-size: 13px; }
 .a-divider-normal { border: none; border-top: 1px solid var(--line); margin: 20px 0 14px; }
 #ab-registration-link-section .a-text-bold { font-size: 14px; }
 
+/* AWS WAF CAPTCHA iframe host (step 4) */
+.captcha-frame {
+  width: 100%; min-height: 340px; border: none; display: block;
+  background: #fff; border-radius: 8px;
+}
+
 /* ===== AWS WAF CAPTCHA "home" screen (step 4) — literal structure, Aurora theme ===== */
 .home.box.screen { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 6px 0; }
 .home .logo { width: 96px; height: auto; margin: 4px 0 16px; }

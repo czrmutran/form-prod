@@ -126,72 +126,15 @@
     show(4); // -> captcha intro
   });
 
-  // ---------- Screen 4: AWS WAF CAPTCHA home (Start Puzzle button, no id) ----------
-  document.querySelector('[data-theme="home.verifyButton"]').addEventListener("click", function () {
-    show(5);        // attach screen 5 first
-    buildCaptcha(); // then build (queries screen-5 elements)
-  });
-
-  // ---------- Screen 5: captcha challenge ----------
-  var ICONS = ["🏆", "🔔", "📷", "🎧", "🚀", "🎲", "🔑", "⭐"];
-  var SLOTS = 8, RADIUS = 52, CENTER = 75;
-  var captcha = { current: 0, target: 0 };
-
-  function slotPos(i) {
-    var ang = (-90 + i * (360 / SLOTS)) * Math.PI / 180;
-    return { x: CENTER + RADIUS * Math.cos(ang), y: CENTER + RADIUS * Math.sin(ang) };
-  }
-
-  function buildCaptcha() {
-    var orbit = $("captcha-orbit");
-    orbit.querySelectorAll(".orbit-slot").forEach(function (n) { n.remove(); });
-
-    captcha.target = Math.floor(Math.random() * SLOTS);
-    captcha.current = (captcha.target + 3 + Math.floor(Math.random() * 3)) % SLOTS;
-    var icon = ICONS[Math.floor(Math.random() * ICONS.length)];
-    var num = Math.floor(10 + Math.random() * 89);
-
-    $("target-icon").textContent = icon;
-    $("orbit-icon").textContent = icon;
-    $("target-num").textContent = num;
-
-    for (var i = 0; i < SLOTS; i++) {
-      var p = slotPos(i);
-      var slot = document.createElement("div");
-      slot.className = "orbit-slot" + (i === captcha.target ? " is-target" : "");
-      slot.style.left = p.x + "px";
-      slot.style.top = p.y + "px";
-      slot.style.background = i === captcha.target ? "rgba(229,72,77,.15)" : "rgba(255,255,255,.06)";
-      slot.textContent = i === captcha.target ? "◎" : "";
-      orbit.appendChild(slot);
+  // ---------- Screen 4: AWS WAF CAPTCHA hosted in an iframe (captcha.html) ----------
+  // The captcha runs inside the iframe and postMessages the parent when solved,
+  // mirroring the real AWS WAF token callback.
+  window.addEventListener("message", function (e) {
+    if (e && e.data && e.data.type === "captcha-solved") {
+      state.emailOtp = genOtp();
+      show(6); // populate() fills cvf-account-claim / otp-email-debug from state
+      $("cvf-input-code").focus();
     }
-    setError(null, "err-captcha", "");
-    placeIcon();
-  }
-
-  function placeIcon() {
-    var p = slotPos(captcha.current);
-    $("orbit-icon").style.left = p.x + "px";
-    $("orbit-icon").style.top = p.y + "px";
-  }
-
-  $("orbit-left").addEventListener("click", function () {
-    captcha.current = (captcha.current - 1 + SLOTS) % SLOTS; placeIcon();
-  });
-  $("orbit-right").addEventListener("click", function () {
-    captcha.current = (captcha.current + 1) % SLOTS; placeIcon();
-  });
-  $("amzn-captcha-refresh-button").addEventListener("click", buildCaptcha);
-
-  $("amzn-btn-verify-internal").addEventListener("click", function () {
-    if (captcha.current !== captcha.target) {
-      setError(null, "err-captcha", "Posição incorreta. Mova o ícone até a órbita destacada.");
-      return;
-    }
-    setError(null, "err-captcha", "");
-    state.emailOtp = genOtp();
-    show(6); // populate() fills cvf-account-claim / otp-email-debug from state
-    $("cvf-input-code").focus();
   });
 
   // ---------- Screen 6: email OTP (cvf-input-code) ----------

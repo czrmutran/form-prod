@@ -22,20 +22,27 @@ async function readDemoOtp(page, debugId) {
   return m[1];
 }
 
-// Solve the orbit captcha by moving the icon onto the highlighted target slot.
-async function solveCaptcha(page) {
+// The captcha lives inside the AWS WAF iframe (like the official site).
+function captchaFrame(page) {
+  return page.frameLocator("#aws-waf-captcha");
+}
+
+// Inside the iframe: Start Puzzle, move the icon onto the target orbit, Submit.
+async function solveCaptchaInFrame(page) {
+  const frame = captchaFrame(page);
+  await frame.getByRole("button", { name: "Start Puzzle" }).click();
   const center = async (loc) => {
     const b = await loc.boundingBox();
     return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
   };
-  const targetC = await center(page.locator(".orbit-slot.is-target"));
+  const targetC = await center(frame.locator(".orbit-slot.is-target"));
   for (let i = 0; i < 8; i++) {
-    const iconC = await center(page.locator("#orbit-icon"));
-    if (Math.abs(iconC.x - targetC.x) < 6 && Math.abs(iconC.y - targetC.y) < 6) return;
-    await page.locator("#orbit-right").click();
+    const iconC = await center(frame.locator("#orbit-icon"));
+    if (Math.abs(iconC.x - targetC.x) < 6 && Math.abs(iconC.y - targetC.y) < 6) break;
+    await frame.locator("#orbit-right").click();
     await page.waitForTimeout(60);
   }
-  throw new Error("Não consegui alinhar o ícone do captcha ao alvo");
+  await frame.getByRole("button", { name: "Submit" }).click();
 }
 
 // Walk screens 1 -> 6 (email/details/captcha/email-OTP) for reuse.
@@ -59,13 +66,8 @@ async function reachEmailOtpVerified(page) {
   await aButton(page, "continue-register").click();
   await expect(screen(page, 4)).toBeVisible();
 
-  // Screen 4 -> captcha
-  await page.getByRole("button", { name: "Start Puzzle" }).click();
-  await expect(screen(page, 5)).toBeVisible();
-
-  // Screen 5 captcha
-  await solveCaptcha(page);
-  await aButton(page, "amzn-btn-verify-internal").click();
+  // Screen 4 -> captcha inside the iframe; solving it advances to screen 6
+  await solveCaptchaInFrame(page);
   await expect(screen(page, 6)).toBeVisible();
 
   // Screen 6 email OTP
@@ -154,7 +156,7 @@ test("etapa 3: senha curta e senhas diferentes mostram erros", async ({ page }) 
   await expect(screen(page, 4)).toBeHidden();
 });
 
-test("etapa 5: captcha na posição errada mostra erro", async ({ page }) => {
+test("etapa 4: captcha na posição errada mostra erro (dentro do iframe)", async ({ page }) => {
   await page.goto(FILE_URL);
   await page.fill("#ap_email_login", "teste@email.com");
   await aButton(page, "continue").click();
@@ -163,12 +165,12 @@ test("etapa 5: captcha na posição errada mostra erro", async ({ page }) => {
   await page.fill("#ap_password", "segredo123");
   await page.fill("#ap_password_check", "segredo123");
   await aButton(page, "continue-register").click();
-  await page.getByRole("button", { name: "Start Puzzle" }).click();
-  await expect(screen(page, 5)).toBeVisible();
 
+  const frame = captchaFrame(page);
+  await frame.getByRole("button", { name: "Start Puzzle" }).click();
   // submete sem alinhar (estado inicial começa longe do alvo)
-  await aButton(page, "amzn-btn-verify-internal").click();
-  await expect(page.locator("#err-captcha")).toContainText("incorreta");
+  await frame.getByRole("button", { name: "Submit" }).click();
+  await expect(frame.locator("#err-captcha")).toContainText("Incorrect");
   await expect(screen(page, 6)).toBeHidden();
 });
 
@@ -182,9 +184,7 @@ test("etapa 6: OTP de e-mail incorreto é rejeitado", async ({ page }) => {
   await page.fill("#ap_password", "segredo123");
   await page.fill("#ap_password_check", "segredo123");
   await aButton(page, "continue-register").click();
-  await page.getByRole("button", { name: "Start Puzzle" }).click();
-  await solveCaptcha(page);
-  await aButton(page, "amzn-btn-verify-internal").click();
+  await solveCaptchaInFrame(page);
   await expect(screen(page, 6)).toBeVisible();
 
   await page.fill("#cvf-input-code", "000000");
@@ -230,13 +230,10 @@ test("todos os a-button (em cada tela) seguem a estrutura da Amazon", async ({ p
   await page.fill("#ap_password", "segredo123");
   await page.fill("#ap_password_check", "segredo123");
   await aButton(page, "continue-register").click();
-  await assertAButtons(page, seen); // screen 4 (Start Puzzle is a WAF <button>, not an a-button)
+  await assertAButtons(page, seen); // screen 4 (captcha iframe — no a-buttons in the parent)
 
-  await page.getByRole("button", { name: "Start Puzzle" }).click();
-  await assertAButtons(page, seen); // screen 5
-
-  await solveCaptcha(page);
-  await aButton(page, "amzn-btn-verify-internal").click();
+  await solveCaptchaInFrame(page);
+  await expect(screen(page, 6)).toBeVisible(); // wait for the async postMessage -> show(6)
   await assertAButtons(page, seen); // screen 6
 
   const emailOtp = await readDemoOtp(page, "otp-email-debug");
@@ -253,6 +250,6 @@ test("todos os a-button (em cada tela) seguem a estrutura da Amazon", async ({ p
   await aButton(page, "cvf-submit-create-account").click();
   await assertAButtons(page, seen); // screen 9 (restart button)
 
-  // 8 primary a-buttons validated (step 4 uses the AWS WAF <button>, not an a-button).
-  expect(seen.size).toBe(8);
+  // 7 primary a-buttons validated (step 4 is the captcha iframe — no a-button in the parent).
+  expect(seen.size).toBe(7);
 });
